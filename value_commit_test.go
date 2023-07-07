@@ -53,3 +53,51 @@ func TestValueCommit_Insert(t *testing.T) {
 		t.Fatalf("commit expect:  %v, get: %v", fc2.commit, fc.commit)
 	}
 }
+
+func TestValueCommit_BatchUpdate(t *testing.T) {
+	fc := NewContext(dataCase)
+	seed1 := make([]byte, 32)
+	rand.Read(seed1)
+	seed2 := make([]byte, 32)
+	rand.Read(seed2)
+	seed3 := make([]byte, 32)
+	rand.Read(seed3)
+
+	keys := []fr.Element{fr.NewElement(1), fr.NewElement(2), fr.NewElement(3)}
+	values := []fr.Element{*new(fr.Element).SetBytes(seed1), *new(fr.Element).SetBytes(seed2), *new(fr.Element).SetBytes(seed3)}
+
+	err := fc.BatchUpdate(keys, values)
+	assert.Equal(t, nil, err)
+
+	dataCase[1] = Account{fr.NewElement(1), *new(fr.Element).SetBytes(seed1)}
+	dataCase[2] = Account{fr.NewElement(2), *new(fr.Element).SetBytes(seed2)}
+	dataCase[3] = Account{fr.NewElement(3), *new(fr.Element).SetBytes(seed3)}
+	fc2 := NewContext(dataCase)
+	if !fc.commit.Equal(&fc2.commit) {
+		t.Fatalf("commit expect:  %v, get: %v", fc2.commit, fc.commit)
+	}
+}
+
+func TestValueCommit_Proof_Verify(t *testing.T) {
+	fc := NewContext(dataCase)
+	proof, err := fc.Proof()
+	assert.Equal(t, nil, err)
+
+	err = fc.Verify(proof)
+	assert.Equal(t, nil, err)
+}
+
+func TestValueCommit_ProofForKey_VerifyForKey(t *testing.T) {
+	fc := NewContext(dataCase)
+
+	// random a key
+	key := fr.NewElement(4097)
+	proof, err := fc.ProofForKey(key)
+	assert.Equal(t, nil, err)
+
+	output, err := domains.EvaluateLagrangePolynomial(fc.values, key)
+	assert.Equal(t, nil, err)
+
+	err = fc.VerifyForKey(key, *output, proof)
+	assert.Equal(t, nil, err)
+}
