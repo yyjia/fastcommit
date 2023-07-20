@@ -111,6 +111,11 @@ func (s *ValueCommit) ProofForKey(evaluation fr.Element) (bls12381.G1Affine, err
 	return openingProof.QuotientCommitment, nil
 }
 
+func (s *ValueCommit) ProofForKeys(keys []fr.Element) (bls12381.G1Affine, error) {
+
+	return bls12381.G1Affine{}, nil
+}
+
 func (s *ValueCommit) Verify(proof bls12381.G1Affine) error {
 	evaluationChallenge := computeChallenge(s.values, s.commit)
 	outputPoint, err := domains.EvaluateLagrangePolynomial(s.values, evaluationChallenge)

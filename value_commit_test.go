@@ -100,4 +100,15 @@ func TestValueCommit_ProofForKey_VerifyForKey(t *testing.T) {
 
 	err = fc.VerifyForKey(key, *output, proof)
 	assert.Equal(t, nil, err)
+
+	k2 := domains.Roots[4000]
+	proof, err = fc.ProofForKey(k2)
+	assert.Equal(t, nil, err)
+
+	output, err = domains.EvaluateLagrangePolynomial(fc.values, k2)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, fc.values[4000], *output)
+
+	err = fc.VerifyForKey(k2, *output, proof)
+	assert.Equal(t, nil, err)
 }
