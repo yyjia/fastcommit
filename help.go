@@ -2,31 +2,28 @@ package fastcommit
 
 import (
 	"github.com/consensys/gnark-crypto/ecc/bls12-381/fr"
-	"github.com/consensys/gnark-crypto/ecc/bls12-381/fr/kzg"
-	"github.com/panjf2000/ants/v2"
-	"sync"
 )
 
-func allPoly(data []Account) {
-	keys := make([]fr.Element, len(data))
-	for i := range data {
-		keys[i] = data[i].key
-	}
-
-	var wg sync.WaitGroup
-	p, _ := ants.NewPoolWithFunc(12, func(i interface{}) {
-		defer wg.Done()
-		poly := lagrange(keys, i.(int))
-		kzg.Commit(poly, srs.Pk)
-	})
-	defer p.Release()
-
-	for i := 0; i < len(keys); i++ {
-		wg.Add(i)
-		_ = p.Invoke(i)
-	}
-	wg.Wait()
-}
+//func allPoly(data []Account) {
+//	keys := make([]fr.Element, len(data))
+//	for i := range data {
+//		keys[i] = data[i].key
+//	}
+//
+//	var wg sync.WaitGroup
+//	p, _ := ants.NewPoolWithFunc(12, func(i interface{}) {
+//		defer wg.Done()
+//		poly := lagrange(keys, i.(int))
+//		kzg.Commit(poly, srs.Pk)
+//	})
+//	defer p.Release()
+//
+//	for i := 0; i < len(keys); i++ {
+//		wg.Add(i)
+//		_ = p.Invoke(i)
+//	}
+//	wg.Wait()
+//}
 
 func lagrange(keys []fr.Element, index int) []fr.Element {
 	var one = fr.NewElement(1)
