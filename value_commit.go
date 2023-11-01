@@ -5,9 +5,10 @@ import (
 	bls12381 "github.com/consensys/gnark-crypto/ecc/bls12-381"
 	"github.com/consensys/gnark-crypto/ecc/bls12-381/fr"
 	"github.com/consensys/gnark-crypto/ecc/bls12-381/fr/kzg"
+	"math/big"
+
 	//crateKzg "github.com/crate-crypto/go-kzg-4844/internal/kzg"
 	crateKzg "github/yyjia/fastcommit/crateKzg/kzg"
-	"math/big"
 )
 
 const POLY_SIZE = 4096
@@ -76,9 +77,11 @@ func (s *ValueCommit) Update(index int, v fr.Element) error {
 	//}
 	//index := s.keys[k]
 
-	sub := new(fr.Element).Sub(&v, &s.values[index])
-	bInt := new(big.Int)
-	sub.BigInt(bInt)
+	//sub := new(fr.Element).Sub(&v, &s.values[index])
+	//bInt := new(big.Int)
+	//sub.BigInt(bInt)
+
+	bInt := new(fr.Element).Sub(&v, &s.values[index]).BigInt(new(big.Int))
 
 	addC := new(bls12381.G1Affine).ScalarMultiplication(&srs.Pk.G1[index], bInt)
 	s.commit = *new(bls12381.G1Affine).Add(&s.commit, addC)
